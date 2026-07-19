@@ -17,7 +17,7 @@ from docx.shared import Inches, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "analysis" / "prognosis_prediction" / "results"
 PAPER = RESULTS / "paper_outputs"
-OUTPUT = PAPER / "GBCS_five_year_prognosis_model_manuscript_WITH_STUDY_FLOW.docx"
+OUTPUT = PAPER / "GBCS_five_year_prognosis_model_manuscript_EXPANDED_2026-07-19.docx"
 FLOW_FIGURE = PAPER / "figure1_study_flow.png"
 
 BLUE = "2E74B5"
@@ -466,96 +466,74 @@ def build_document():
     add_text(doc, "Keywords: breast cancer; prognosis; prediction model; overall survival; calibration; China; PREDICT", bold_prefix="Keywords: ", align=WD_ALIGN_PARAGRAPH.LEFT, after=12)
 
     h(doc, "Introduction", 1)
-    add_text(doc, "Breast cancer is a major and growing health burden in China, with substantial variation in stage at diagnosis, tumor biology, treatment access, and outcomes across settings.1,2 Individualized estimates of absolute mortality risk can support prognosis discussions, risk-stratified follow-up, and the design of clinical studies, provided that the model is well calibrated in the population where it will be applied.")
-    add_text(doc, "Several prognostic tools are available. PREDICT was developed using United Kingdom registry data to estimate survival after surgery and the absolute benefits of adjuvant treatment, and subsequent versions incorporated HER2 and contemporary treatment effects.5-7 Chinese cohorts have also produced conventional nomograms and machine-learning models, but many tools rely on treatment variables measured after diagnosis, restrict the target population, or have limited validation across time and clinical settings.3,4")
+    add_text(doc, "Breast cancer is a major and growing health burden in China, with substantial variation in stage at diagnosis, tumor biology, treatment access, and outcomes across settings.1,2 Individualized estimates of absolute mortality risk can support prognosis discussions, risk-stratified follow-up, and the design of clinical studies, provided that the model is well calibrated in the population where it will be applied. Models developed elsewhere may preserve risk ranking yet misestimate absolute risk when baseline hazards, case mix, ascertainment, and treatment patterns differ.")
+    add_text(doc, "Several prognostic tools are available. PREDICT was developed using United Kingdom registry data to estimate survival after surgery and the absolute benefits of adjuvant treatment, and subsequent versions incorporated HER2 and contemporary treatment effects.5-7 Chinese cohorts have also produced conventional nomograms and machine-learning models, but many tools rely on treatment variables measured after diagnosis, restrict the target population, or have limited validation across time and clinical settings.3,4 Recent validations in mainland China and Southeast Asia illustrate that discrimination and calibration can vary by version and subgroup.8,9")
     add_text(doc, "The Guangzhou Breast Cancer Study (GBCS) is a prospective patient cohort established in 2008 across three hospitals in South China, with systematic collection of clinicopathological factors and longitudinal outcomes.1 We aimed to develop a parsimonious diagnosis-time model for five-year all-cause mortality using routinely available clinical predictors, evaluate optimism-corrected and temporal performance, and benchmark ranking and calibration against PREDICT v2.2. Five-year progression-free survival (PFS) was evaluated as a secondary outcome.")
 
     h(doc, "Methods", 1)
     h(doc, "Study design and participants", 2)
-    add_text(doc, "This prognostic model development and internal validation study used the 2023 linked follow-up database of the GBCS. The parent cohort has been described previously.1 Eligible participants had invasive breast cancer, a diagnosis date from 1 October 2008 through 31 January 2018, nonnegative recorded follow-up times, and valid event indicators for overall survival (OS) and PFS. The prediction time origin was the date of diagnosis. The intended initial use is research and prognosis stratification rather than direct treatment selection.")
+    add_text(doc, "This prognostic model development and internal validation study used the 2023 linked follow-up database of the Guangzhou Breast Cancer Study (GBCS), a multicenter, hospital-based prospective cohort in the Pearl River Delta region of South China. The parent cohort recruited patients between October 2008 and January 2018 from the First Affiliated Hospital, Second Affiliated Hospital, and Cancer Center of Sun Yat-sen University.1 The parent study enrolled 9,029 patients with breast disease, including 5,471 with pathologically confirmed breast cancer; 5,136 had invasive disease and 335 had ductal carcinoma in situ.1 The analytic database available for the present study contained 5,412 linked breast-cancer records, reflecting the linkage and data-freeze version used for prognostic modeling.")
+    add_text(doc, "Parent-cohort eligibility required newly diagnosed, pathologically confirmed primary breast cancer and residence in the Pearl River Delta for at least five years. Patients with a previous malignant tumor or mental illness, those unable to communicate because of severe illness, and those with cognitive impairment were excluded.1 For this analysis, we additionally required a classification code indicating invasive breast cancer, diagnosis from 1 October 2008 through 31 January 2018, nonnegative recorded follow-up times, and valid event indicators for both overall survival (OS) and progression-free survival (PFS). The prediction time origin was the date of diagnosis. The intended use is research and prognosis stratification at diagnosis, not direct treatment selection.")
+
+    h(doc, "Data collection and follow-up", 2)
+    add_text(doc, "At enrollment, trained interviewers administered a structured questionnaire developed from instruments of the Vanderbilt Breast Cancer Epidemiology Research Group and adapted for Guangdong. Face-to-face interviews generally lasted 30-60 minutes and covered sociodemographic factors, menstrual and reproductive history, medical history, exogenous-hormone use, diet, physical activity, occupation, personal habits, and family history.1 Tumor size, nodal involvement, stage, ER, PR, HER2, Ki-67, and other clinical information were abstracted from hospital medical records. The present model used variables available at or near diagnosis; post-diagnosis treatments were not candidate predictors.")
+    add_text(doc, "Follow-up combined active contact and passive review of hospital electronic records. Participants were scheduled for contact every three months in the first year, every six months in years two and three, and annually thereafter until death. Active follow-up recorded survival status, treatment, incident diseases, occupational and lifestyle changes, and updated contact information; passive follow-up captured progression, mortality, and clinical events in the hospital systems.1 The analysis used follow-up information updated through 31 December 2023.")
 
     h(doc, "Outcomes", 2)
-    add_text(doc, "The primary outcome was all-cause mortality within five years after diagnosis. The secondary outcome was progression or death within five years, using the PFS definition in the source follow-up database. Participants without an event were censored at their last recorded follow-up. Follow-up duration was summarized using the reverse Kaplan-Meier method.")
+    add_text(doc, "The primary outcome was all-cause mortality within five years after diagnosis. OS time was measured from diagnosis to death from any cause or last known follow-up. The secondary outcome was progression or death within five years, using the PFS event definition and dates recorded in the linked follow-up database. Participants without the relevant event were censored at their last recorded follow-up. The prediction horizon was fixed at 60 months. Potential follow-up was summarized with the reverse Kaplan-Meier estimator, which treats censoring times as events and deaths as censored observations.")
 
     h(doc, "Candidate predictors", 2)
-    add_text(doc, "The prespecified clinical model included age at diagnosis, AJCC stage (I-IV), estrogen receptor (ER), progesterone receptor (PR), HER2, and Ki-67. These variables were chosen because they are routinely available at diagnosis and have established prognostic relevance. Age was modeled continuously using a natural cubic spline with internal knots at 43 and 52 years and boundary knots at 19 and 97 years. No univariable screening was used, and all clinical predictors were retained. Treatment variables were excluded because they occurred after the prediction time and could introduce information leakage and treatment-policy dependence.")
+    add_text(doc, "The prespecified clinical model included age at diagnosis, anatomic stage (I-IV), estrogen receptor (ER), progesterone receptor (PR), HER2, and Ki-67. Predictors were selected before outcome modeling because they are routinely collected in GBCS, are available at diagnosis, and represent complementary dimensions of prognosis: host age, anatomic disease burden, hormone-receptor biology, HER2 biology, and proliferation. Age was modeled continuously with a three-degree-of-freedom natural cubic spline, using internal knots at 43 and 52 years and boundary knots at 19 and 97 years. Stage and biomarkers were entered as categorical variables. No univariable screening or data-driven deletion of the six clinical predictors was performed. Treatment variables were excluded because they occurred after the prediction time and could introduce information leakage and treatment-policy dependence.")
 
     h(doc, "Missing data", 2)
-    add_text(doc, "Predictor missingness ranged from 0.2% for age to 15.3% for Ki-67. Ten multiply imputed datasets were generated by chained equations with 10 iterations. Event indicators and Nelson-Aalen cumulative-hazard estimates were included in the imputation process. Model estimation and prediction were repeated within each imputed dataset, with coefficient uncertainty pooled using Rubin rules where applicable.")
+    add_text(doc, "Among final-model predictors, missingness was 0.2% for age, 11.6% for stage, 8.8% for ER, 9.0% for PR, 11.9% for HER2, and 15.3% for Ki-67. We assumed data were missing at random conditional on the variables included in the imputation model. Ten multiply imputed datasets were generated by chained equations with 10 iterations. The imputation model included candidate predictors, outcome-event indicators, and Nelson-Aalen cumulative-hazard estimates to preserve associations with survival outcomes. Categorical variables were imputed on their analysis scale. Model fitting, validation, and individual risk prediction were repeated within each imputed dataset; coefficients and standard errors were combined using Rubin rules when pooled estimates were required, while performance estimates were averaged across imputations.")
 
     h(doc, "Model development and selection", 2)
-    add_text(doc, "Separate Cox proportional-hazards models were fitted for OS and PFS. The primary clinical model was compared with an extended Cox model adding body mass index, menopausal status, education, parity, breastfeeding, and family history, and with an elastic-net Cox model using the extended predictor set. The final model was selected using validated discrimination, prediction error, calibration, parsimony, and feasibility of implementation. Individual five-year risks from the final model were averaged across the 10 imputation-specific clinical Cox fits.")
+    add_text(doc, "Separate Cox proportional-hazards models were fitted for OS and PFS. The primary clinical model was compared with an extended Cox model adding body mass index, menopausal status, education, parity, breastfeeding, and family history, and with an elastic-net Cox model using the extended predictor set. The elastic net used alpha=0.5, 10-fold cross-validation, and the one-standard-error penalty. The final model was selected using validated discrimination, prediction error, calibration, parsimony, and feasibility of implementation rather than apparent fit alone. For imputation-specific model j, five-year risk was calculated as 1 - exp[-H0j(60) exp(LPij)], where H0j(60) is the baseline cumulative hazard at 60 months and LPij is the patient's linear predictor. The deployed GBCS estimate is the arithmetic mean of the 10 imputation-specific risks.")
 
     h(doc, "Model performance and validation", 2)
-    add_text(doc, "Discrimination was quantified using Harrell's C-index and a censoring-adjusted five-year AUC. Overall prediction error was measured using the inverse-probability-of-censoring-weighted Brier score. Calibration was assessed with calibration-in-the-large, the calibration slope, and observed versus mean predicted risk across tenths of predicted risk. Internal validation used 50 bootstrap samples within each of 10 imputations (500 replicates per model and endpoint) to estimate optimism. Temporal validation fitted models using patients diagnosed through 2014 and evaluated them among patients diagnosed from 2015 onward. Leave-one-hospital-out analyses and decision-curve analyses were prespecified as supporting analyses.")
+    add_text(doc, "Discrimination was quantified by Harrell's C-index over observed follow-up and a censoring-adjusted, time-dependent AUC at five years. Overall prediction error was measured by the inverse-probability-of-censoring-weighted Brier score at five years; lower values indicate smaller squared prediction error. Calibration was evaluated by calibration-in-the-large (mean predicted minus Kaplan-Meier observed risk), the calibration slope obtained by refitting the model linear predictor, and observed versus mean predicted risk in tenths of predicted risk. Calibration slopes near 1 and calibration-in-the-large near 0 indicate agreement, but no single metric was treated as sufficient.16")
+    add_text(doc, "Internal validation used 50 bootstrap samples in each of the 10 imputed datasets (500 replicates per candidate model and endpoint). In each replicate, model fitting and performance estimation were repeated in the bootstrap and original samples, and the mean optimism was subtracted from apparent performance. Temporal validation fitted the clinical model among 2,577 patients diagnosed through 2014 and evaluated it without refitting among 1,654 patients diagnosed from 2015 onward. As supporting internal-external validation, the extended model was trained while leaving out one of the three GBCS hospitals and then tested in the omitted hospital. Decision curves compared net benefit over clinically plausible threshold probabilities; these curves were considered exploratory.")
 
     h(doc, "Comparison with PREDICT", 2)
-    add_text(doc, "PREDICT v2.2 was used as a benchmark in temporal-validation patients with nonmetastatic disease, age 25-85 years, known ER status, and recorded T and N categories. Exact tumor size and positive-node count were used when available; otherwise, prespecified representative values were assigned for T1-T4 and N0-N3 categories. Detection method was set to PREDICT's unknown category. The GBCS Ki-67 threshold of at least 14% was mapped to the binary PREDICT input, which uses a threshold above 10%. Because chemotherapy generation, endocrine-therapy duration, trastuzumab exposure, and bisphosphonate treatment were not sufficiently complete, the comparison used PREDICT surgery-only survival. Model differences in AUC and Brier score were estimated using 500 paired bootstrap samples.")
+    add_text(doc, "PREDICT v2.2 was used as a benchmark in temporal-validation patients with nonmetastatic disease, age 25-85 years, known ER status, and recorded T and N categories. Exact tumor size and positive-node count were used when available; otherwise, prespecified representative values were assigned for T1-T4 and N0-N3 categories. Detection method was set to PREDICT's unknown category. The GBCS Ki-67 threshold of at least 14% was mapped to the binary PREDICT input, which uses a threshold above 10% (Supplementary Table S5). Because chemotherapy generation, endocrine-therapy duration, trastuzumab exposure, and bisphosphonate treatment were not sufficiently complete, the comparison used PREDICT surgery-only survival. Model differences in AUC and Brier score were estimated using 500 paired bootstrap samples.")
 
     h(doc, "Statistical analysis and reporting", 2)
-    add_text(doc, "Analyses were performed in R using survival, mice, and glmnet. Two-sided P values were descriptive because the study objective was prediction rather than causal inference. The manuscript was structured according to TRIPOD+AI, and model limitations were considered using PROBAST+AI principles.8,9 Modern sample-size guidance emphasizes participants, outcome events, and predictor parameters rather than a fixed events-per-variable rule.10,11")
+    add_text(doc, "Analyses were performed in R using survival, mice, and glmnet. Two-sided P values and hazard-ratio confidence intervals were descriptive because the study objective was prediction rather than causal inference. The 4,231-patient cohort contained 492 deaths over all follow-up and 293 deaths by five years, providing substantially more outcome information than the number of final-model parameters; sample-size adequacy was judged in relation to event frequency, candidate parameters, anticipated model fit, and shrinkage rather than a fixed events-per-variable rule.14,15 Reporting follows TRIPOD+AI, and limitations were considered using PROBAST+AI principles.12,13")
 
     h(doc, "Ethics", 2)
-    add_text(doc, "The Guangzhou Medical Ethics Committee of the Chinese Medical Association approved the parent GBCS (ID 2012-8), and all participants provided written informed consent.1 Any additional approval or waiver specific to this secondary prognostic-model analysis should be confirmed before submission.")
+    add_text(doc, "The GBCS was conducted in accordance with the Declaration of Helsinki and approved by the Ethics Committee of Sun Yat-sen University (IRB 2012-8). All participants provided written informed consent.1 Any additional approval or waiver specific to this secondary prognostic-model analysis should be confirmed before submission.")
 
     h(doc, "Results", 1)
     h(doc, "Study population", 2)
-    add_text(doc, "Of 5,412 records in the linked GBCS database, 355 were excluded because the classification did not indicate invasive disease, 701 because the diagnosis date was missing or outside the prespecified recruitment window, and 125 because survival follow-up was missing or invalid. The final analysis included 4,231 women with invasive breast cancer (Figure 1). Mean age at diagnosis was 47.9 years (SD 10.6), and median age was 47 years (IQR 41-55). Among patients with recorded stage, stage II was most frequent. During follow-up, 492 deaths and 810 PFS events occurred; 293 deaths and 570 PFS events occurred within five years. Median follow-up for OS was 94.1 months (7.84 years; IQR 73.2-129.4). Detailed cohort characteristics and missingness are provided in Supplementary Tables S1 and S7.")
-
-    doc.add_page_break()
-    add_figure(
-        doc, FLOW_FIGURE, 6.2,
-        "Figure 1", "Flow of participant selection, analysis sets, model development, and validation. Bootstrap, temporal, and leave-one-hospital-out procedures are internal validation within the GBCS system. The PREDICT analysis is a benchmark comparison, not external validation. ER, estrogen receptor; GBCS, Guangzhou Breast Cancer Study; HER2, human epidermal growth factor receptor 2; OS, overall survival; PFS, progression-free survival; PR, progesterone receptor."
-    )
+    add_text(doc, "Of 5,412 breast-cancer records in the linked analysis database, 355 were excluded because the classification did not indicate invasive disease, 701 because the diagnosis date was missing or outside the prespecified recruitment window, and 125 because survival follow-up was missing or invalid. The final analysis comprised 4,231 women with invasive breast cancer (Figure 1). Of these, 2,577 (60.9%) were diagnosed through 2014 and contributed to temporal model development, and 1,654 (39.1%) were diagnosed from 2015 onward and contributed to temporal validation. All 4,231 patients contributed to full-cohort model development and bootstrap validation.")
+    add_text(doc, "Mean age at diagnosis was 47.9 years (SD 10.6), and median age was 47 years (IQR 41-55). The Cancer Center contributed 1,949 patients (46.1%), Hospital 2 contributed 1,372 (32.4%), and Hospital 1 contributed 910 (21.5%). Among all patients, 1,909 (45.1%) had stage II disease, 1,053 (24.9%) stage I, 664 (15.7%) stage III, and 114 (2.7%) stage IV; stage was missing for 491. ER was positive in 2,912 (68.8%), PR in 2,587 (61.1%), and HER2 in 788 (18.6%), while 2,644 (62.5%) had Ki-67 at least 14% (Table 1).")
+    add_text(doc, "During follow-up, 492 deaths and 810 PFS events occurred; 293 deaths and 570 PFS events occurred within five years. Reverse Kaplan-Meier median follow-up for OS was 94.1 months (7.84 years; IQR 73.2-129.4). Missingness for final-model predictors ranged from 0.2% to 15.3% (Supplementary Table S6).")
 
     h(doc, "Model selection and prognostic structure", 2)
-    add_text(doc, "The final model retained age, stage, ER, PR, HER2, and Ki-67. The extended clinical model produced negligible optimism-corrected gains over the six-predictor model (five-year OS AUC 0.778 vs 0.775; Brier score 0.0611 vs 0.0610), whereas the one-standard-error elastic-net model underfit (AUC 0.719; calibration slope 2.64). The parsimonious clinical Cox model was therefore selected. Stage was the dominant prognostic factor: compared with stage I, the pooled hazard ratios for mortality were 1.57 (95% CI 1.17-2.11), 5.09 (3.72-6.97), and 15.83 (10.74-23.33) for stages II, III, and IV, respectively. PR positivity was associated with lower mortality, and Ki-67 at least 14% with higher mortality (Supplementary Table S2). These coefficients describe prognosis and should not be interpreted causally.")
+    add_text(doc, "The extended clinical model produced negligible optimism-corrected gains over the six-predictor model (five-year OS AUC 0.778 vs 0.775; Brier score 0.0611 vs 0.0610), whereas the one-standard-error elastic-net model underfit (AUC 0.719; calibration slope 2.64). The parsimonious clinical Cox model was therefore selected (Supplementary Table S3).")
+    add_text(doc, "The final model retained age, stage, ER, PR, HER2, and Ki-67. Stage provided the largest prognostic separation: compared with stage I, pooled mortality hazard ratios were 1.57 (95% CI 1.17-2.11), 5.09 (3.72-6.97), and 15.83 (10.74-23.33) for stages II, III, and IV, respectively. PR positivity was associated with lower mortality and Ki-67 at least 14% with higher mortality. The age spline and individual biomarker coefficients are reported in Supplementary Table S1. These associations describe the model's prognostic structure and should not be interpreted causally.")
 
     h(doc, "Internal and temporal validation", 2)
-    add_text(doc, "After bootstrap optimism correction, the five-year OS model had a C-index of 0.749, AUC of 0.775, Brier score of 0.061, and calibration slope of 0.970. In temporal validation among 1,654 patients diagnosed from 2015 onward, the C-index was 0.762, AUC was 0.779, Brier score was 0.061, and calibration slope was 0.964 (Table 1). Calibration-in-the-large was close to zero in both analyses. The secondary PFS model showed lower discrimination but similar calibration slopes (Supplementary Tables S3 and S4; Supplementary Figures S1 and S2).")
-
-    perf = pd.read_csv(PAPER / "table3_five_year_performance.csv")
-    os_perf = perf[perf.endpoint == "OS"].copy()
-    table1_rows = []
-    for _, row in os_perf.iterrows():
-        table1_rows.append([
-            row["validation"], fmt(row["c_index"]), fmt(row["auc_5year"]),
-            fmt(row["brier_5year"]), fmt(row["calibration_slope"]),
-            f"{row['calibration_in_large'] * 100:.2f}%",
-        ])
-    add_caption(doc, "Table 1", "Performance of the final GBCS model for five-year all-cause mortality.")
-    add_table(doc, ["Validation", "C-index", "5-y AUC", "5-y Brier", "Calibration slope", "Calibration-in-the-large"], table1_rows,
-              [3000, 1100, 1100, 1100, 1450, 1610], numeric_cols={1, 2, 3, 4, 5}, font_size=8.5)
-    add_text(doc, "AUC, area under the time-dependent receiver operating characteristic curve; GBCS, Guangzhou Breast Cancer Study. Calibration-in-the-large is mean predicted risk minus Kaplan-Meier observed risk.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
+    add_text(doc, "After bootstrap optimism correction, the five-year OS model had a C-index of 0.749, AUC of 0.775, Brier score of 0.061, calibration slope of 0.970, and calibration-in-the-large of 0.07% (Table 2). In temporal validation, the C-index was 0.762, AUC was 0.779, Brier score was 0.061, calibration slope was 0.964, and calibration-in-the-large was 0.43%. Thus, discrimination and overall calibration were maintained in later diagnoses, with little evidence of systematic average underprediction or overprediction. Decile-based calibration results are shown in Supplementary Figure S1.")
+    add_text(doc, "The secondary PFS model showed lower discrimination. Its optimism-corrected C-index was 0.690 and five-year AUC 0.713; corresponding temporal-validation estimates were 0.699 and 0.725. Brier scores were 0.109 and 0.108 and calibration slopes were 0.976 and 0.957, respectively (Supplementary Table S2 and Supplementary Figures S1-S2). In leave-one-hospital-out analyses, OS AUCs were similar across hospitals (0.757-0.771), whereas PFS AUC ranged from 0.633 to 0.745, suggesting greater heterogeneity in progression ascertainment or case mix (Supplementary Table S4). Exploratory decision curves are provided in Supplementary Figure S3.")
 
     h(doc, "Benchmark against PREDICT", 2)
-    add_text(doc, "The temporal PREDICT comparison included 1,371 nonmetastatic patients and 77 deaths within five years. Discrimination was similar for GBCS and PREDICT v2.2 surgery-only predictions: AUCs were 0.752 and 0.758, respectively, with a paired difference of -0.006 (95% bootstrap CI -0.035 to 0.027). The Brier score was lower for GBCS (0.0527 vs 0.0752; paired difference -0.0225, 95% CI -0.0293 to -0.0151). Mean predicted mortality was 6.46% for GBCS and 17.16% for PREDICT surgery only, compared with Kaplan-Meier observed mortality of 6.05% (Table 2 and Figure 2). Across common GBCS-risk deciles, GBCS predictions followed the observed mortality gradient more closely, while PREDICT surgery-only risks were progressively higher in the upper deciles.")
+    add_text(doc, "The temporal PREDICT comparison included 1,371 nonmetastatic patients and 77 deaths within five years; 283 temporal-validation patients did not meet benchmark eligibility (Figure 1). Discrimination was similar for GBCS and PREDICT v2.2 surgery-only predictions: AUCs were 0.752 and 0.758, respectively, with a paired difference of -0.006 (95% bootstrap CI -0.035 to 0.027). The Brier score was lower for GBCS (0.0527 vs 0.0752; paired difference -0.0225, 95% CI -0.0293 to -0.0151) (Table 3).")
+    add_text(doc, "Mean predicted five-year mortality was 6.46% for GBCS and 17.16% for PREDICT surgery only, compared with Kaplan-Meier observed mortality of 6.05%. The GBCS calibration slope was 1.124 and the PREDICT slope 0.790. Across common deciles of GBCS-predicted risk, both models showed increasing risk, but PREDICT surgery-only predictions increasingly exceeded observed mortality in the upper deciles (Figure 2). This comparison evaluates the available surgery-only PREDICT baseline, not a fully treatment-specified prediction.")
 
-    comp = pd.read_csv(PAPER / "table4_gbcs_predict_comparison.csv")
-    table2_rows = []
-    labels = {"GBCS_clinical_Cox": "GBCS clinical Cox", "PREDICT_v2.2_surgery_only": "PREDICT v2.2 surgery only"}
-    for _, row in comp.iterrows():
-        table2_rows.append([
-            labels[row.model], fmt(row.auc_5year), f"{row.brier_5year:.4f}",
-            fmt(row.calibration_slope), f"{100*row.mean_predicted_risk:.2f}%", f"{100*row.observed_risk:.2f}%",
-        ])
-    add_caption(doc, "Table 2", "Five-year mortality prediction in the temporal PREDICT-comparison cohort (n=1,371).")
-    add_table(doc, ["Model", "5-y AUC", "5-y Brier", "Calibration slope", "Mean predicted risk", "Observed risk"], table2_rows,
-              [2800, 1050, 1100, 1350, 1600, 1460], numeric_cols={1, 2, 3, 4, 5}, font_size=8.5)
-    add_text(doc, "Paired AUC difference (GBCS minus PREDICT), -0.006 (95% bootstrap CI -0.035 to 0.027); paired Brier-score difference, -0.0225 (95% CI -0.0293 to -0.0151). PREDICT calibration used surgery-only survival because complete adjuvant-treatment inputs were unavailable.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
-
-    add_figure(
-        doc, PAPER / "figure1_gbcs_predict_observed_by_decile.png", 6.2,
-        "Figure 2", "Observed and predicted five-year mortality by decile of GBCS-predicted risk. Gray bars show Kaplan-Meier observed mortality; lines show mean GBCS and PREDICT v2.2 surgery-only predictions. Deciles contain the same patients for all three series."
-    )
+    h(doc, "Model diagnostics", 2)
+    add_text(doc, "Schoenfeld-residual tests indicated departures from proportional hazards for both endpoints. The global test was significant in all 10 imputed datasets for OS and PFS; age, ER, and PR most consistently contributed to nonproportionality, while Ki-67 was significant in 8 of 10 OS imputations and 9 of 10 PFS imputations (Supplementary Table S7). Because the primary target is absolute risk at a fixed five-year horizon and calibration remained close, these findings do not invalidate the reported predictions, but they do preclude interpreting hazard ratios as time-constant effects and motivate prespecified flexible time-varying-effect analyses before submission.")
 
     h(doc, "Discussion", 1)
-    add_text(doc, "In this multicenter prospective cohort from South China, a diagnosis-time Cox model using six routinely available predictors achieved useful discrimination and close five-year calibration within the GBCS system. Performance remained similar when the model was trained in earlier diagnoses and evaluated in patients diagnosed from 2015 onward. The extended model offered no meaningful improvement, supporting selection of the more parsimonious model. A secondary PFS model was less discriminating, and hospital hold-out analyses suggested heterogeneity in PFS transportability.")
-    add_text(doc, "The GBCS model and PREDICT ranked five-year mortality risk similarly in the temporal comparison, but their absolute predictions differed. PREDICT was originally developed for early invasive breast cancer after surgery in the United Kingdom and was designed to estimate both prognosis and treatment benefit.5-7 Our benchmark necessarily used surgery-only survival because detailed adjuvant-treatment inputs were incomplete. The resulting overprediction in a treated cohort is therefore expected and should not be interpreted as evidence that a fully specified contemporary PREDICT model is poorly calibrated in South China.")
-    add_text(doc, "The model's five-year AUC of 0.775 after optimism correction is comparable with performance reported for clinical prognostic tools in Chinese breast cancer cohorts, although direct comparisons are limited by differences in populations, outcomes, predictor availability, and validation design.3,4 The present model prioritizes prediction at diagnosis and excludes treatment variables, which makes the time origin explicit and avoids leakage but means that predictions reflect the treatment patterns embedded in the development cohort. Calibration is particularly important for this use because good discrimination alone does not ensure reliable absolute risk estimates.12")
-    add_text(doc, "Strengths include the prospective cohort design, recruitment from three clinical centers, nearly eight years of median follow-up, prespecified routinely available predictors, multiple imputation, and validation addressing optimism and temporal transportability. We also report calibration, prediction error, and a paired PREDICT benchmark rather than relying only on discrimination.")
-    add_text(doc, "Several limitations require emphasis. First, bootstrap, temporal, and hospital hold-out analyses remain internal validation; the model has not been evaluated in an independent healthcare system. Second, proportional-hazards diagnostics were significant for the global OS and PFS models, particularly for age and hormone-receptor variables. Five-year calibration was acceptable, but regression coefficients should not be interpreted as constant causal effects, and flexible time-varying-effect sensitivity analyses are needed before submission. Third, missing predictor values were imputed, and predictor and outcome definitions depend on the source database. Fourth, the model predicts all-cause mortality and does not separate breast cancer deaths from competing mortality. Fifth, the PREDICT input mapping approximated tumor size and node count for some patients, used a mismatched Ki-67 cutoff, and lacked treatment information. Finally, treatment patterns and diagnostic practices have evolved since cohort recruitment, so future application will require contemporary external validation and, where necessary, recalibration.")
-    add_text(doc, "The current model should therefore be viewed as a research tool for risk stratification and as a candidate for independent validation. The next steps are to evaluate transportability in a non-GBCS Chinese cohort, examine flexible survival models with time-varying effects, quantify performance in clinically important subgroups, and assess whether use of the model improves decisions or patient outcomes.")
+    add_text(doc, "In this multicenter prospective cohort from South China, a diagnosis-time Cox model based on six routinely recorded variables showed useful discrimination and close average five-year calibration within the GBCS system. Optimism-corrected AUC was 0.775, and performance was maintained when the model was trained in diagnoses through 2014 and evaluated in later patients. The extended clinical model added little, while the elastic-net model underfit. These results favor a transparent, parsimonious model for this dataset and intended use. The secondary PFS model discriminated less well, and its hospital hold-out performance varied more, consistent with greater heterogeneity in progression detection and recording than in mortality follow-up.")
+    add_text(doc, "Our discrimination estimates are broadly consistent with reports from Asian breast-cancer cohorts, while direct numerical comparison requires caution. A Chinese postoperative nomogram developed in 5,504 patients reported a five-year AUC of 0.723 and included age, tumor diameter, differentiation, nodal metastasis, ER, and PR.3 A Chinese machine-learning study combined clinical, pathologic, and molecular information for early invasive disease and reported improvements from multidimensional predictors.4 In a much larger English linked-data study, regression and machine-learning methods were compared using internal-external validation; the Cox model achieved the most consistent performance, with a pooled C-index of 0.858, whereas machine-learning models had more variable calibration.10 That higher C-index concerns 10-year breast-cancer mortality in a different population with substantially more predictors and events, but its relative findings support our observation that greater algorithmic complexity does not guarantee better validated prediction.")
+    add_text(doc, "The model's prognostic structure is clinically coherent. Anatomic stage produced the largest risk separation because it summarizes primary-tumor extent, nodal burden, and metastatic disease. ER and PR reflect endocrine-responsive tumor biology, HER2 identifies a biologically distinct subtype whose prognosis is strongly influenced by targeted therapy, and Ki-67 captures proliferative activity. Age contributes both breast-cancer and other-cause mortality information and was modeled flexibly to avoid imposing linearity. The association of higher Ki-67 with poorer prognosis is consistent with its established prognostic role, but Ki-67 assessment is vulnerable to preanalytic, scoring, and between-laboratory variability.11 The 14% GBCS cutoff should therefore be treated as a cohort-specific operational definition, not a universally interchangeable threshold.")
+    add_text(doc, "The GBCS and PREDICT v2.2 models ranked five-year mortality risk similarly in the eligible temporal subset. PREDICT was originally developed in the United Kingdom for early invasive breast cancer after surgery and estimates prognosis together with incremental adjuvant-treatment benefit.5-7 External studies show why calibration must be examined locally. In 5,424 surgically treated women in mainland China, PREDICT v3.0 and v2.2 produced five-year AUCs of 0.756 and 0.771; v3.0 improved the difference between predicted and observed survival from -7.3% to -2.0%.8 In 1,480 women with stage I-III disease in Malaysia, an earlier PREDICT version achieved a five-year AUC of 0.78 and overall predicted survival within 1.3 percentage points of observed survival, although subgroup miscalibration remained.9 These findings resemble our discrimination results and show that a model can rank patients reasonably well while absolute-risk agreement depends on model version, population, treatment inputs, and subgroup.")
+    add_text(doc, "The lower Brier score and closer mean risk of the GBCS model in our comparison should be interpreted narrowly. Our GBCS model estimates prognosis under the treatment patterns experienced in the cohort. Complete chemotherapy generation, endocrine-therapy duration, trastuzumab exposure, bisphosphonate use, and radiotherapy inputs were unavailable for the online benchmark, so PREDICT was evaluated using surgery-only survival. Applying an untreated baseline to a treated cohort will tend to overstate mortality, particularly among higher-risk patients who are more likely to receive effective systemic therapy. The comparison therefore supports similar discrimination but cannot establish that GBCS is better calibrated than a fully specified contemporary PREDICT calculation. PREDICT v3.0 should be evaluated when complete treatment inputs and a validated batch implementation are available.")
+    add_text(doc, "Strengths include prospective cohort infrastructure, recruitment across three specialist centers, detailed baseline and clinicopathological data, active and passive follow-up, and nearly eight years of median potential follow-up. The analysis prespecified a diagnosis-time target, retained predictors without univariable screening, modeled age flexibly, addressed missing data with multiple imputation, and evaluated discrimination, calibration, and prediction error. Bootstrap correction, temporal validation, and hospital hold-outs assessed different forms of internal validity, and the paired PREDICT analysis used identical patients and censoring structure. Reporting calibration alongside discrimination is essential because good ranking alone does not make absolute risks clinically reliable.16")
+    add_text(doc, "Several limitations remain. First, bootstrap, temporal, and hospital hold-out analyses are all internal to GBCS; convenience recruitment at leading hospitals may limit transportability to community hospitals, other Chinese regions, or contemporary populations. Second, proportional-hazards tests were significant globally for OS and PFS, especially for age and hormone-receptor variables. Five-year calibration was acceptable, but coefficients are not constant causal effects, and flexible time-varying-effect sensitivity analyses remain necessary before submission. Third, 11.6%-15.3% of several key predictors were missing and results depend on the missing-at-random assumption. Fourth, pathology measurements were abstracted from routine care across centers and years; Ki-67 and equivocal HER2 coding may not be fully harmonized. Fifth, all-cause mortality combines breast-cancer and competing deaths, while PFS definitions and ascertainment may vary between hospitals. Sixth, treatment was deliberately excluded at diagnosis, so predicted absolute risks embed historical GBCS treatment patterns and may require recalibration as care evolves. Finally, the PREDICT comparison used approximated size and node inputs for some patients, a mismatched Ki-67 threshold, and incomplete treatment information.")
+    add_text(doc, "The model is therefore ready for independent validation as a research prediction rule, not for immediate clinical deployment. Priority studies should validate the frozen equation and baseline hazards in a geographically and organizationally independent Chinese cohort, assess calibration by stage, age, receptor subtype, hospital type, and calendar period, examine time-varying effects and competing risks, and update only if prespecified performance criteria are not met. Any subsequent implementation should include a usable calculator, prospective monitoring for calibration drift, and an impact study demonstrating that risk estimates improve decisions or outcomes without widening disparities.")
 
     h(doc, "Conclusions", 1)
     add_text(doc, "A parsimonious GBCS model based on age, stage, ER, PR, HER2, and Ki-67 predicted five-year all-cause mortality with useful discrimination and close calibration during internal and temporal validation. Its discrimination was similar to PREDICT v2.2 in an eligible temporal subset, but calibration comparisons were constrained by unavailable treatment inputs. Independent external validation and impact evaluation are required before clinical implementation.")
@@ -579,6 +557,10 @@ def build_document():
         "Wishart GC, Azzato EM, Greenberg DC, et al. PREDICT: a new UK prognostic model that predicts survival following surgery for invasive breast cancer. Breast Cancer Res. 2010;12(1):R1. doi:10.1186/bcr2464.",
         "Wishart GC, Bajdik CD, Dicks E, et al. PREDICT Plus: development and validation of a prognostic model for early breast cancer that includes HER2. Br J Cancer. 2012;107(5):800-807. doi:10.1038/bjc.2012.338.",
         "Grootes I, Wishart GC, Pharoah PDP. An updated PREDICT breast cancer prognostic model including the benefits and harms of radiotherapy. NPJ Breast Cancer. 2024;10(1):6. doi:10.1038/s41523-024-00612-y.",
+        "Chen E, Chen C, Chen Y, et al. Insights into the performance of PREDICT tool in a large Mainland Chinese breast cancer cohort: a comparative analysis of versions 3.0 and 2.2. Oncologist. 2024;29(8):e976-e983. doi:10.1093/oncolo/oyae164.",
+        "Wong HS, Subramaniam S, Alias Z, et al. The predictive accuracy of PREDICT: a personalized decision-making tool for Southeast Asian women with breast cancer. Medicine (Baltimore). 2015;94(8):e593. doi:10.1097/MD.0000000000000593.",
+        "Clift AK, Dodwell D, Lord S, et al. Development and internal-external validation of statistical and machine learning models for breast cancer prognostication: cohort study. BMJ. 2023;381:e073800. doi:10.1136/bmj-2022-073800.",
+        "Dowsett M, Nielsen TO, A'Hern R, et al. Assessment of Ki67 in breast cancer: recommendations from the International Ki67 in Breast Cancer Working Group. J Natl Cancer Inst. 2011;103(22):1656-1664. doi:10.1093/jnci/djr393.",
         "Collins GS, Moons KGM, Dhiman P, et al. TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods. BMJ. 2024;385:e078378. doi:10.1136/bmj-2023-078378.",
         "Moons KGM, Damen JAA, Kaul T, et al. PROBAST+AI: an updated quality, risk of bias, and applicability assessment tool for prediction models using regression or artificial intelligence methods. BMJ. 2025;388:e082505. doi:10.1136/bmj-2024-082505.",
         "Riley RD, Snell KI, Ensor J, et al. Minimum sample size for developing a multivariable prediction model: Part II - binary and time-to-event outcomes. Stat Med. 2019;38(7):1276-1296. doi:10.1002/sim.7992.",
@@ -593,6 +575,55 @@ def build_document():
         p.paragraph_format.line_spacing = 1.0
         r = p.add_run(f"{i}. {ref}")
         font_run(r, size=9.5)
+
+    # Journal submission layout: all main tables and figures follow the references.
+    doc.add_page_break()
+    h(doc, "Tables", 1)
+
+    t1 = pd.read_csv(PAPER / "table1_cohort_characteristics.csv")
+    table1_rows = [[r.characteristic, "" if pd.isna(r.level) else r.level, r.value, str(int(r.missing))] for _, r in t1.iterrows()]
+    add_caption(doc, "Table 1", "Characteristics of the 4,231-patient GBCS analysis cohort.")
+    add_table(doc, ["Characteristic", "Level", "Value", "Missing, n"], table1_rows,
+              [3100, 2400, 2400, 1460], numeric_cols={2, 3}, font_size=8.5)
+    add_text(doc, "Percentages use the full analysis cohort as denominator; category percentages do not sum to 100% where data are missing. ER, estrogen receptor; HER2, human epidermal growth factor receptor 2; IQR, interquartile range; PFS, progression-free survival; PR, progesterone receptor; SD, standard deviation.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
+
+    perf = pd.read_csv(PAPER / "table3_five_year_performance.csv")
+    os_perf = perf[perf.endpoint == "OS"].copy()
+    table2_rows = []
+    for _, row in os_perf.iterrows():
+        table2_rows.append([
+            row["validation"], fmt(row["c_index"]), fmt(row["auc_5year"]),
+            fmt(row["brier_5year"]), fmt(row["calibration_slope"]),
+            f"{row['calibration_in_large'] * 100:.2f}%",
+        ])
+    add_caption(doc, "Table 2", "Performance of the final GBCS model for five-year all-cause mortality.")
+    add_table(doc, ["Validation", "C-index", "5-y AUC", "5-y Brier", "Calibration slope", "Calibration-in-the-large"], table2_rows,
+              [3000, 1100, 1100, 1100, 1450, 1610], numeric_cols={1, 2, 3, 4, 5}, font_size=8.5)
+    add_text(doc, "AUC, area under the time-dependent receiver operating characteristic curve; GBCS, Guangzhou Breast Cancer Study. Calibration-in-the-large is mean predicted risk minus Kaplan-Meier observed risk.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
+
+    comp = pd.read_csv(PAPER / "table4_gbcs_predict_comparison.csv")
+    table3_rows = []
+    labels = {"GBCS_clinical_Cox": "GBCS clinical Cox", "PREDICT_v2.2_surgery_only": "PREDICT v2.2 surgery only"}
+    for _, row in comp.iterrows():
+        table3_rows.append([
+            labels[row.model], fmt(row.auc_5year), f"{row.brier_5year:.4f}",
+            fmt(row.calibration_slope), f"{100*row.mean_predicted_risk:.2f}%", f"{100*row.observed_risk:.2f}%",
+        ])
+    add_caption(doc, "Table 3", "Five-year mortality prediction in the temporal PREDICT-comparison cohort (n=1,371).")
+    add_table(doc, ["Model", "5-y AUC", "5-y Brier", "Calibration slope", "Mean predicted risk", "Observed risk"], table3_rows,
+              [2800, 1050, 1100, 1350, 1600, 1460], numeric_cols={1, 2, 3, 4, 5}, font_size=8.5)
+    add_text(doc, "Paired AUC difference (GBCS minus PREDICT), -0.006 (95% bootstrap CI -0.035 to 0.027); paired Brier-score difference, -0.0225 (95% CI -0.0293 to -0.0151). PREDICT calibration used surgery-only survival because complete adjuvant-treatment inputs were unavailable.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
+
+    doc.add_page_break()
+    h(doc, "Figures", 1)
+    add_figure(
+        doc, FLOW_FIGURE, 6.2,
+        "Figure 1", "Flow of participant selection, analysis sets, model development, and validation. Bootstrap, temporal, and leave-one-hospital-out procedures are internal validation within the GBCS system. The PREDICT analysis is a benchmark comparison, not external validation. ER, estrogen receptor; GBCS, Guangzhou Breast Cancer Study; HER2, human epidermal growth factor receptor 2; OS, overall survival; PFS, progression-free survival; PR, progesterone receptor."
+    )
+    add_figure(
+        doc, PAPER / "figure1_gbcs_predict_observed_by_decile.png", 6.2,
+        "Figure 2", "Observed and predicted five-year mortality by decile of GBCS-predicted risk. Gray bars show Kaplan-Meier observed mortality; lines show mean GBCS and PREDICT v2.2 surgery-only predictions. Deciles contain the same patients for all three series."
+    )
 
     # Supplementary material in the same editable file for easy submission splitting.
     doc.add_page_break()
@@ -614,51 +645,43 @@ def build_document():
     add_text(doc, "The extended Cox model added BMI, menopausal status, education, parity, breastfeeding, and family history. The elastic-net model used alpha=0.5 with 10-fold cross-validation and the one-standard-error penalty. The clinical model was selected because the extended model's validated performance gain was negligible and the elastic-net model showed substantial underfitting.")
 
     # Supplementary Table S1
-    t1 = pd.read_csv(PAPER / "table1_cohort_characteristics.csv")
-    s1_rows = [[r.characteristic, "" if pd.isna(r.level) else r.level, r.value, str(int(r.missing))] for _, r in t1.iterrows()]
-    add_caption(doc, "Supplementary Table S1", "Characteristics of the 4,231-patient analysis cohort.")
-    add_table(doc, ["Characteristic", "Level", "Value", "Missing, n"], s1_rows,
-              [3100, 2400, 2400, 1460], numeric_cols={2, 3}, font_size=8.5)
-    add_text(doc, "Percentages use the full analysis cohort as denominator; category percentages therefore do not sum to 100% when data are missing.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
-
-    # Supplementary Table S2
     t2 = pd.read_csv(PAPER / "table2_final_model_coefficients.csv")
     s2_rows = [[r.endpoint, r.term_label, f"{r.coefficient:.3f}", f"{r.standard_error:.3f}", r.hr_95ci, r.p_formatted] for _, r in t2.iterrows()]
-    add_caption(doc, "Supplementary Table S2", "Pooled coefficients for the final clinical Cox models.")
+    add_caption(doc, "Supplementary Table S1", "Pooled coefficients for the final clinical Cox models.")
     add_table(doc, ["Endpoint", "Predictor", "Beta", "SE", "Hazard ratio (95% CI)", "P value"], s2_rows,
               [850, 3650, 900, 900, 2000, 1060], numeric_cols={0, 2, 3, 4, 5}, font_size=7.8)
     add_text(doc, "Age was represented by a three-degree-of-freedom natural spline; individual spline coefficients should not be interpreted in isolation. Reference groups were stage I, ER negative, PR negative, HER2 negative, and Ki-67 <14%.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
 
-    # Supplementary Table S3
+    # Supplementary Table S2
     s3_rows = []
     for _, r in perf.iterrows():
         s3_rows.append([r.endpoint, r.validation, fmt(r.c_index), fmt(r.auc_5year), fmt(r.brier_5year), fmt(r.calibration_slope), f"{100*r.calibration_in_large:.2f}%"])
-    add_caption(doc, "Supplementary Table S3", "Five-year performance of the final OS and PFS models.")
+    add_caption(doc, "Supplementary Table S2", "Five-year performance of the final OS and PFS models.")
     add_table(doc, ["Endpoint", "Validation", "C-index", "AUC", "Brier", "Calibration slope", "Calibration-in-the-large"], s3_rows,
               [850, 2650, 900, 900, 900, 1400, 1760], numeric_cols={0, 2, 3, 4, 5, 6}, font_size=7.8)
 
-    # Supplementary Table S4
+    # Supplementary Table S3
     validated = pd.read_csv(RESULTS / "validated_model_performance.csv")
     validated = validated[validated.horizon_months == 60].copy()
     model_labels = {"clinical_cox": "Clinical Cox", "extended_cox": "Extended Cox", "elastic_net": "Elastic net"}
     s4_rows = []
     for _, r in validated.sort_values(["endpoint", "model"]).iterrows():
         s4_rows.append([r.endpoint, model_labels[r.model], fmt(r.corrected_c_index), fmt(r.corrected_auc), fmt(r.corrected_brier), fmt(r.validation_calibration_slope)])
-    add_caption(doc, "Supplementary Table S4", "Bootstrap optimism-corrected comparison of candidate five-year models.")
+    add_caption(doc, "Supplementary Table S3", "Bootstrap optimism-corrected comparison of candidate five-year models.")
     add_table(doc, ["Endpoint", "Model", "C-index", "AUC", "Brier", "Calibration slope"], s4_rows,
               [950, 2300, 1350, 1350, 1350, 2060], numeric_cols={0, 2, 3, 4, 5}, font_size=8.2)
 
-    # Supplementary Table S5
+    # Supplementary Table S4
     hospital = pd.read_csv(RESULTS / "hospital_validation_summary.csv")
     s5_rows = []
     for _, r in hospital.sort_values(["endpoint", "held_out_hospital"]).iterrows():
         s5_rows.append([r.endpoint, r.held_out_hospital, fmt(r.c_index), fmt(r.auc), fmt(r.brier), fmt(r.calibration_slope), f"{100*r.calibration_in_large:.2f}%"])
-    add_caption(doc, "Supplementary Table S5", "Leave-one-hospital-out performance of the extended Cox model at five years.")
+    add_caption(doc, "Supplementary Table S4", "Leave-one-hospital-out performance of the extended Cox model at five years.")
     add_table(doc, ["Endpoint", "Held-out hospital", "C-index", "AUC", "Brier", "Calibration slope", "Calibration-in-the-large"], s5_rows,
               [850, 2150, 950, 950, 950, 1450, 2060], numeric_cols={0, 2, 3, 4, 5, 6}, font_size=7.8)
     add_text(doc, "These hospital hold-outs are internal-external validation within the GBCS system and are not independent external validation.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
 
-    # Supplementary Table S6
+    # Supplementary Table S5
     s6_rows = [
         ["Population", "Diagnosis from 2015; M0; age 25-85 years; known ER; recorded T and N categories"],
         ["Tumor size", "Exact millimeters when available; otherwise T1=15, T2=35, T3=60, T4=50 mm"],
@@ -669,10 +692,10 @@ def build_document():
         ["Detection", "Unavailable; set to PREDICT unknown"],
         ["Treatment", "Surgery-only prediction because detailed systemic and radiation treatment inputs were incomplete"],
     ]
-    add_caption(doc, "Supplementary Table S6", "Mapping of GBCS variables to PREDICT v2.2 inputs.")
+    add_caption(doc, "Supplementary Table S5", "Mapping of GBCS variables to PREDICT v2.2 inputs.")
     add_table(doc, ["Input", "Operational definition"], s6_rows, [2200, 7160], font_size=8.5)
 
-    # Supplementary Table S7
+    # Supplementary Table S6
     missing = pd.read_csv(RESULTS / "predictor_missingness.csv")
     keep = ["age", "stage", "er", "pr", "her2", "ki67", "bmi", "menopause", "education", "parity", "breastfeeding", "family_history"]
     missing = missing[missing.variable.isin(keep)].copy()
@@ -682,10 +705,10 @@ def build_document():
         "breastfeeding": "Breastfeeding", "family_history": "Family history",
     }
     s7_rows = [[variable_labels[r.variable], str(int(r.non_missing)), str(int(r.missing)), f"{r.missing_percent:.1f}%"] for _, r in missing.iterrows()]
-    add_caption(doc, "Supplementary Table S7", "Predictor missingness before multiple imputation.")
+    add_caption(doc, "Supplementary Table S6", "Predictor missingness before multiple imputation.")
     add_table(doc, ["Predictor", "Observed, n", "Missing, n", "Missing, %"], s7_rows, [3900, 1820, 1820, 1820], numeric_cols={1, 2, 3}, font_size=8.5)
 
-    # Supplementary Table S8: PH diagnostic consistency.
+    # Supplementary Table S7: PH diagnostic consistency.
     ph = pd.read_csv(RESULTS / "proportional_hazards_diagnostics.csv")
     ph["term_short"] = ph.term.str.replace(r"ns\(age.*", "Age spline", regex=True)
     ph["term_short"] = ph.term_short.replace({"stage": "Stage", "er": "ER", "pr": "PR", "her2": "HER2", "ki67": "Ki-67", "GLOBAL": "Global test"})
@@ -697,7 +720,7 @@ def build_document():
     ph_sum["ord"] = ph_sum.term_short.map(term_order)
     ph_sum = ph_sum.sort_values(["endpoint", "ord"])
     s8_rows = [[r.endpoint, r.term_short, f"{int(r.imputations_p_lt_005)}/10", "<0.001" if r.median_p < 0.001 else f"{r.median_p:.3f}"] for _, r in ph_sum.iterrows()]
-    add_caption(doc, "Supplementary Table S8", "Proportional-hazards diagnostics across imputed datasets.")
+    add_caption(doc, "Supplementary Table S7", "Proportional-hazards diagnostics across imputed datasets.")
     add_table(doc, ["Endpoint", "Term", "Imputations with P<0.05", "Median P value"], s8_rows, [1200, 3150, 2650, 2360], numeric_cols={0, 2, 3}, font_size=8.5)
     add_text(doc, "Schoenfeld-residual tests used the Kaplan-Meier transformation. These results motivate a flexible time-varying-effect sensitivity analysis before journal submission.", italic=True, align=WD_ALIGN_PARAGRAPH.LEFT, before=4, after=10)
 

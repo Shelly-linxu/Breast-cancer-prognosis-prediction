@@ -15,9 +15,9 @@ No participant-level data are included in this repository. Access to the GBCS da
 ```text
 analysis/prognosis_prediction/
 ├── gbcs_prognosis_models.R        # Cohort construction, imputation, model fitting and validation
-├── compare_predict_v22_5year.R  # Five-year comparison with PREDICT v2.2
-├── prepare_paper_results.R       # Publication tables and figures
-├── score_gbcs_clinical_model.R  # Scoring function for the saved model bundle
+├── compare_predict_v22_5year.R   # Five-year comparison with PREDICT v2.2
+├── prepare_paper_results.R        # Publication tables and figures
+├── score_gbcs_clinical_model.R   # Scoring function for the saved model bundle
 ├── build_manuscript.py           # Word manuscript and study-flow figure builder
 └── docs/
     ├── model_report.md
@@ -119,7 +119,7 @@ This produces the main GBCS-versus-PREDICT figure, calibration and discriminatio
 python3 analysis/prognosis_prediction/build_manuscript.py
 ```
 
-The manuscript builder creates the participant-selection and validation flow diagram, updates all figure numbering, and writes the combined main manuscript and supplementary materials to `analysis/prognosis_prediction/results/paper_outputs/`.
+The manuscript builder creates the participant-selection and validation flow diagram and writes the combined main manuscript and supplementary materials to `analysis/prognosis_prediction/results/paper_outputs/`. The generated submission draft places all main tables and figures after the references, followed by the supplementary methods, tables, and figures.
 
 ## Score the saved model
 
