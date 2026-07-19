@@ -1,0 +1,27 @@
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+.env
+__pycache__/
+*.py[cod]
+
+# Participant-level and restricted data
+data/
+*.sav
+*.dta
+*.sas7bdat
+*.rds
+*.zip
+*.rar
+
+# Generated analysis and manuscript outputs
+analysis/prognosis_prediction/results/
+*.docx
+*.pdf
+
+# Local environments
+.venv/
+venv/
+renv/library/
+renv/staging/
