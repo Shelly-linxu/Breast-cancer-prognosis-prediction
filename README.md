@@ -18,6 +18,8 @@ analysis/prognosis_prediction/
 ├── compare_predict_v22_5year.R   # Five-year comparison with PREDICT v2.2
 ├── prepare_paper_results.R        # Publication tables and figures
 ├── score_gbcs_clinical_model.R   # Scoring function for the saved model bundle
+├── export_static_calculator_model.R # Export locked model parameters for browser scoring
+├── add_calculator_to_manuscript.py  # Add calculator documentation to the current manuscript
 ├── build_manuscript.py           # Word manuscript and study-flow figure builder
 └── docs/
     ├── model_report.md
@@ -26,6 +28,8 @@ analysis/prognosis_prediction/
 ```
 
 Generated outputs are written to `analysis/prognosis_prediction/results/` and are intentionally excluded from version control.
+
+The static research-preview calculator is in `calculator/`. It has no server-side component and contains no participant-level data.
 
 ## Analysis population and model
 
@@ -144,6 +148,32 @@ score_gbcs_model(
   bundle_path = "analysis/prognosis_prediction/results/gbcs_clinical_model_bundle.rds"
 )
 ```
+
+## Use the static web calculator
+
+The English-language **GBCS 5-year OS Calculator — Research Preview v1.0** is intended to be available at:
+
+<https://shelly-linxu.github.io/Breast-cancer-prognosis-prediction/calculator/>
+
+It reports five-year all-cause mortality, five-year overall survival, and the range across the 10 imputed model fits. All six predictors are required. Calculations occur entirely in the browser; no patient information is uploaded, retained, or added to the URL.
+
+To use it locally, open `calculator/index.html` or serve the directory with any static web server. No package installation or build step is required.
+
+Regenerate the browser parameters from the locked model bundle:
+
+```bash
+Rscript analysis/prognosis_prediction/export_static_calculator_model.R \
+  analysis/prognosis_prediction/results/gbcs_clinical_model_bundle.rds \
+  calculator/model.js
+```
+
+Verify browser scoring against the prespecified R-reference profiles:
+
+```bash
+node calculator/test_scoring.js
+```
+
+This is a research tool, not a treatment recommendation. Independent external validation and clinical-impact evaluation remain necessary.
 
 ## Reproducibility and reporting notes
 

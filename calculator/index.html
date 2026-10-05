@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Research-preview calculator for five-year all-cause mortality after invasive breast cancer diagnosis in the Guangzhou Breast Cancer Study.">
+  <meta name="theme-color" content="#173f5f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23173f5f'/%3E%3Cpath d='M18 43V21h8c8 0 12 3 12 9 0 4-2 6-5 7l8 6H30l-6-5v5z' fill='white'/%3E%3C/svg%3E">
+  <title>GBCS 5-year OS Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="#top" aria-label="GBCS calculator home">
+        <span class="brand-mark" aria-hidden="true">G</span>
+        <span>Guangzhou Breast Cancer Study</span>
+      </a>
+      <span class="status-badge">Research preview · External validation pending</span>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero shell" aria-labelledby="page-title">
+      <p class="eyebrow">Diagnosis-time prognostic model</p>
+      <h1 id="page-title">GBCS 5-year OS Calculator</h1>
+      <p class="hero-copy">Estimate five-year all-cause mortality and overall survival for women newly diagnosed with invasive breast cancer using six routinely available clinical factors.</p>
+    </section>
+
+    <section class="calculator-shell shell" aria-label="Five-year prognosis calculator">
+      <form id="calculator-form" class="input-panel" novalidate>
+        <div class="section-heading">
+          <span class="step">01</span>
+          <div>
+            <h2>Patient characteristics</h2>
+            <p>Enter values recorded at initial diagnosis, before treatment begins.</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field field-wide">
+            <label for="age">Age at diagnosis</label>
+            <div class="number-wrap">
+              <input id="age" name="age" type="number" min="19" max="97" step="1" value="50" inputmode="numeric" required aria-describedby="age-help age-error">
+              <span>years</span>
+            </div>
+            <p class="field-help" id="age-help">Model-supported range: 19–97 years.</p>
+            <p class="field-error" id="age-error" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="stage">AJCC overall stage</label>
+            <select id="stage" name="stage" required>
+              <option value="I">Stage I</option>
+              <option value="II" selected>Stage II</option>
+              <option value="III">Stage III</option>
+              <option value="IV">Stage IV</option>
+            </select>
+            <p class="field-help">Overall stage at initial diagnosis.</p>
+          </div>
+
+          <div class="field">
+            <label for="er">Oestrogen receptor (ER)</label>
+            <select id="er" name="er" required>
+              <option value="Positive" selected>Positive</option>
+              <option value="Negative">Negative</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="pr">Progesterone receptor (PR)</label>
+            <select id="pr" name="pr" required>
+              <option value="Positive" selected>Positive</option>
+              <option value="Negative">Negative</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="her2">HER2 status</label>
+            <select id="her2" name="her2" required>
+              <option value="Negative" selected>Negative</option>
+              <option value="Equivocal">Equivocal</option>
+              <option value="Positive">Positive</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="ki67">Ki-67</label>
+            <select id="ki67" name="ki67" required>
+              <option value="<14%">&lt;14%</option>
+              <option value=">=14%" selected>≥14%</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="primary-button" type="submit">Calculate prognosis</button>
+          <button class="text-button" type="button" id="reset-button">Reset</button>
+        </div>
+        <p class="privacy-note"><span aria-hidden="true">●</span> Calculations run in this browser. No information is uploaded, retained, or added to the URL.</p>
+      </form>
+
+      <section class="result-panel" aria-labelledby="result-title" aria-live="polite">
+        <div class="section-heading light">
+          <span class="step">02</span>
+          <div>
+            <h2 id="result-title">Estimated five-year prognosis</h2>
+            <p>Calculated from the locked GBCS clinical model.</p>
+          </div>
+        </div>
+
+        <div id="result-empty" class="result-empty">
+          <div class="empty-ring" aria-hidden="true"><span>5</span><small>years</small></div>
+          <p>Complete the six required fields, then select <strong>Calculate prognosis</strong>.</p>
+        </div>
+
+        <div id="result-content" class="result-content" hidden>
+          <div class="risk-visual" aria-hidden="true">
+            <svg viewBox="0 0 220 126" role="img">
+              <path class="gauge-track" d="M25 108 A85 85 0 0 1 195 108" pathLength="100"></path>
+              <path id="gauge-fill" class="gauge-fill" d="M25 108 A85 85 0 0 1 195 108" pathLength="100"></path>
+            </svg>
+            <div class="risk-number"><strong id="mortality-value">—</strong><span>5-year mortality</span></div>
+          </div>
+
+          <div class="result-metrics">
+            <div>
+              <span>Estimated overall survival</span>
+              <strong id="survival-value">—</strong>
+            </div>
+            <div>
+              <span>Range across 10 imputed model fits</span>
+              <strong id="component-range">—</strong>
+            </div>
+          </div>
+
+          <p id="profile-summary" class="profile-summary"></p>
+          <p class="uncertainty-note">The model-component range is not a 95% confidence interval and does not represent every source of uncertainty in an individual prediction.</p>
+          <div class="warning" role="note">
+            <strong>Research use only</strong>
+            <p>This estimate may support research and prognosis discussion. It must not be used alone to select treatment, alter follow-up, or replace clinical judgement.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="information shell" aria-labelledby="about-title">
+      <div class="information-intro">
+        <p class="eyebrow">Model information</p>
+        <h2 id="about-title">What this estimate means</h2>
+        <p>The calculator estimates the probability of death from any cause within five years of breast cancer diagnosis. It reflects outcomes and treatment patterns observed in the Guangzhou Breast Cancer Study; it does not estimate the effect of a specific treatment.</p>
+      </div>
+      <div class="detail-list">
+        <details open>
+          <summary>Who the model is for</summary>
+          <p>Women aged 19–97 years with newly diagnosed invasive breast cancer, stages I–IV. It has not been evaluated for men, carcinoma in situ, recurrent disease, or prediction after treatment has begun.</p>
+        </details>
+        <details>
+          <summary>Predictors and missing information</summary>
+          <p>The model requires age at diagnosis, AJCC overall stage, ER, PR, HER2, and Ki-67. A prediction is not produced if any value is unknown. HER2 equivocal is an explicitly supported model category.</p>
+        </details>
+        <details>
+          <summary>Development and validation</summary>
+          <p>The model was developed using 4,231 women with invasive breast cancer diagnosed between 1 October 2008 and 31 January 2018. Internal validation included bootstrap optimism correction and temporal validation among women diagnosed from 2015 onward. Independent external validation and clinical-impact evaluation remain necessary.</p>
+        </details>
+        <details>
+          <summary>Technical details and limitations</summary>
+          <p>This browser implementation averages predictions from 10 Cox-model fits created after multiple imputation. Age is represented with a natural cubic spline with knots at 43 and 52 years. Limitations include development in a regional cohort, potential temporal and treatment-policy dependence, and evidence of non-proportional hazards in model diagnostics.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <div>
+        <strong>GBCS 5-year OS Calculator</strong>
+        <p>Research Preview v1.0 · Locked model 2026-07-18</p>
+      </div>
+      <div>
+        <a href="https://github.com/Shelly-linxu/Breast-cancer-prognosis-prediction">Source code</a>
+        <p>Manuscript citation to be updated after publication.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="model.js"></script>
+  <script src="scoring.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
